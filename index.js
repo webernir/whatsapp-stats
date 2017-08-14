@@ -5,11 +5,10 @@ const _ = require('lodash')
 const argv = require('yargs').argv
 const moment = require('moment')
 
-async function run(inputPath) {
-  const read = util.promisify(fs.readFile)
-  const write = util.promisify(fs.writeFile)
-  const txt = await read(inputPath, 'utf8')
-  let lines = txt.split('\r\n')
+const read = util.promisify(fs.readFile)
+const write = util.promisify(fs.writeFile)
+
+function getCountByUser(lines) {
 
   let filtered = lines
     .filter(line => !line.includes('group'))
@@ -34,11 +33,7 @@ async function run(inputPath) {
 
   let output = result.map(item => `${item.member},${item.count}\r\n`)
 
-  const filename = `./output/result.${moment().format('YYYYMMDD.HHmm')}.csv`
-
-  await write(filename, output, 'utf8')
-
-  console.log("Done. see file at: \r\n", filename);
+  return output
 }
 
 function getPath() {
@@ -53,4 +48,26 @@ function getPath() {
   return result
 }
 
-run(getPath())
+async function getLines(inputPath) {
+  const txt = await read(inputPath, 'utf8')
+  const lines = txt.split('\r\n')
+  return lines
+}
+
+function getFileName(key) {
+  return `./output/${key}.${moment().format('YYYYMMDD.HHmm')}.csv`
+}
+
+async function writeToFile(data, key) {
+  const filename = getFileName(key)
+  await write(filename, data, 'utf8')
+  console.log("Done. see file at: \r\n", filename);
+}
+
+async function run() {
+  const lines = await getLines(getPath())
+  const countByUser = getCountByUser(lines)
+  await writeToFile(countByUser, 'countByUser')
+}
+
+run()
