@@ -2,12 +2,13 @@ const fs = require('fs')
 const path = require('path')
 const util = require('util')
 const _ = require('lodash')
+const argv = require('yargs').argv
 const uuid = require('uuid/v4')
 
-async function run() {
+async function run(inputPath) {
   const read = util.promisify(fs.readFile)
   const write = util.promisify(fs.writeFile)
-  const txt = await read(path.resolve('./data/chat.20170810.txt'), 'utf8')
+  const txt = await read(inputPath, 'utf8')
   let lines = txt.split('\r\n')
 
   let filtered = lines
@@ -33,7 +34,23 @@ async function run() {
 
   let output = result.map(item => `${item.member},${item.count}\r\n`)
 
-  await write(`./output/result.${uuid()}.csv`, output, 'utf8')
+  const filename = `./output/result.${uuid()}.csv`
+
+  await write(filename, output, 'utf8')
+
+  console.log("Done. see file at: \r\n", filename);
 }
 
-run()
+function getPath() {
+  const input = argv.input
+  if (!input)
+    throw Error('use --input to pass the file path')
+
+  const result = path.resolve(input)
+
+  if (!fs.existsSync(result))
+    throw Error(`file does not exists **** ${result}`)
+  return result
+}
+
+run(getPath())
