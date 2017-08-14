@@ -3,7 +3,7 @@ const path = require('path')
 const util = require('util')
 const _ = require('lodash')
 const argv = require('yargs').argv
-const uuid = require('uuid/v4')
+const moment = require('moment')
 
 async function run(inputPath) {
   const read = util.promisify(fs.readFile)
@@ -34,7 +34,7 @@ async function run(inputPath) {
 
   let output = result.map(item => `${item.member},${item.count}\r\n`)
 
-  const filename = `./output/result.${uuid()}.csv`
+  const filename = `./output/result.${moment().format('YYYYMMDD.HHmm')}.csv`
 
   await write(filename, output, 'utf8')
 
