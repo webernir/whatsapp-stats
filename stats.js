@@ -28,8 +28,6 @@ function getCountByUser(lines) {
   return output
 }
 
-function get
-
 module.exports = {
   getCountByUser
 }
