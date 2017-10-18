@@ -23,7 +23,7 @@ function getPath() {
 
 async function getLines(inputPath) {
   const txt = await read(inputPath, 'utf8')
-  const lines = txt.split('\r\n')
+  const lines = txt.split('\n')
   return lines
 }
 
@@ -39,8 +39,12 @@ async function writeToFile(data, key) {
 
 async function run() {
   const lines = await getLines(getPath())
+  
   const countByUser = stats.getCountByUser(lines)
   await writeToFile(countByUser, 'countByUser')
+
+  const memberInOut = stats.getMemberInOut(lines)
+  await writeToFile(memberInOut, 'memberInOut')
 }
 
 run()
